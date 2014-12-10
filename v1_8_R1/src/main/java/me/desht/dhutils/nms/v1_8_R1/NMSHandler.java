@@ -24,13 +24,13 @@ public class NMSHandler implements NMSAbstraction {
     private boolean a(Chunk that, int i, int j, int k, Block block, int l) {
         int i1 = k << 4 | i;
 
-        if (j >= that.b[i1] - 1) {
-            that.b[i1] = -999;
+        if (j >= that.b[i1] - 1) { // TODO: Reflection: Access f[]
+            that.b[i1] = -999; // TODO: Reflection: Access f[]
         }
 
         int j1 = that.heightMap[i1];
-        Block block1 = that.getType(i, j, k);
-        int k1 = that.getData(i, j, k);
+        Block block1 = that.getType(i, j, k); // TODO: Reflection: access getType()
+        int k1 = that.getData(i, j, k); // TODO: Reflection: access g()
 
         if (block1 == block && k1 == l) {
             return false;
@@ -51,7 +51,7 @@ public class NMSHandler implements NMSAbstraction {
             int i2 = that.locZ * 16 + k;
 
             if (!that.world.isStatic) {
-                block1.f(that.world, l1, j, i2, k1);
+                block1.f(that.world, l1, j, i2, k1); // TODO: switch to k() and use BlockPosition
             }
 
             // CraftBukkit start - Delay removing containers until after they're cleaned up
@@ -61,7 +61,7 @@ public class NMSHandler implements NMSAbstraction {
             // CraftBukkit end
 
             if (!that.world.isStatic) {
-                block1.remove(that.world, l1, j, i2, block1, k1);
+                block1.remove(that.world, l1, j, i2, block1, k1); // TODO: Use blockPosition, blockData
             } else if (block1 instanceof IContainer && block1 != block) {
                 that.world.p(l1, j, i2);
             }
@@ -90,12 +90,12 @@ public class NMSHandler implements NMSAbstraction {
 
                 // CraftBukkit - Don't place while processing the BlockPlaceEvent, unless it's a BlockContainer
                 if (!that.world.isStatic && (!that.world.captureBlockStates || (block instanceof BlockContainer))) {
-                    block.onPlace(that.world, l1, j, i2);
+                    block.onPlace(that.world, l1, j, i2); // TODO: use blockPosition
                 }
 
                 if (block instanceof IContainer) {
                     // CraftBukkit start - Don't create tile entity if placement failed
-                    if (that.getType(i, j, k) != block) {
+                    if (that.getType(i, j, k) != block) { // TODO: Reflection: access getType()
                         return false;
                     }
                     // CraftBukkit end
@@ -103,7 +103,7 @@ public class NMSHandler implements NMSAbstraction {
                     tileentity = that.e(i, j, k);
                     if (tileentity == null) {
                         tileentity = ((IContainer) block).a(that.world, l);
-                        that.world.setTileEntity(l1, j, i2, tileentity);
+                        that.world.setTileEntity(l1, j, i2, tileentity); // TODO: use BlockPosition
                     }
 
                     if (tileentity != null) {
@@ -125,12 +125,12 @@ public class NMSHandler implements NMSAbstraction {
 
 	@Override
 	public int getBlockLightEmission(int blockId) {
-		return Block.getById(blockId).m();
+		return Block.getById(blockId).n(); // note: updated
 	}
 
 	@Override
 	public int getBlockLightBlocking(int blockId) {
-		return Block.getById(blockId).k();
+		return Block.getById(blockId).k(); // TODO: reflection: read int 's'
 	}
 
 	@SuppressWarnings("unchecked")
@@ -142,11 +142,11 @@ public class NMSHandler implements NMSAbstraction {
 	@Override
 	public Vector[] getBlockHitbox(org.bukkit.block.Block block) {
 		net.minecraft.server.v1_8_R1.World w = ((CraftWorld)block.getWorld()).getHandle();
-		net.minecraft.server.v1_8_R1.Block b = w.getType(block.getX(), block.getY(), block.getZ());
-		b.updateShape(w, block.getX(), block.getY(), block.getZ());
+		net.minecraft.server.v1_8_R1.Block b = w.getType(block.getX(), block.getY(), block.getZ()); // TODO: use block position
+		b.updateShape(w, block.getX(), block.getY(), block.getZ()); // TODO: use block position
 		return new Vector[] {
-				new Vector(block.getX() + b.x(), block.getY() + b.z(), block.getZ() + b.B()),
-				new Vector(block.getX() + b.y(), block.getY() + b.A(), block.getZ() + b.C())
+				new Vector(block.getX() + b.z(), block.getY() + b.B(), block.getZ() + b.D()), // note: updated
+				new Vector(block.getX() + b.A(), block.getY() + b.C(), block.getZ() + b.E()) // note: updated
 		};
 	}
 
@@ -166,7 +166,7 @@ public class NMSHandler implements NMSAbstraction {
         int i1 = k << 4 | i;
         int maxY = nmsChunk.heightMap[i1];
 
-        Block block = nmsChunk.getType(i, j, k);
+        Block block = nmsChunk.getType(i, j, k); // TODO: reflection: access getType
         int j2 = block.k();
 
         if (j2 > 0) {
@@ -177,15 +177,16 @@ public class NMSHandler implements NMSAbstraction {
             invokeNmsH(nmsChunk,i, j, k);
         }
 
-        if (nmsChunk.getBrightness(EnumSkyBlock.SKY, i, j, k) > 0 || nmsChunk.getBrightness(EnumSkyBlock.BLOCK, i, j, k) > 0) {
+        if (nmsChunk.getBrightness(EnumSkyBlock.SKY, i, j, k) > 0 // TODO: use blockPosition
+                || nmsChunk.getBrightness(EnumSkyBlock.BLOCK, i, j, k) > 0) { // TODO: use blockPosition
             invokeNmsE(nmsChunk, i, k);
         }
 
         net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
-        w.c(EnumSkyBlock.BLOCK, i, j, k);
+        w.c(EnumSkyBlock.BLOCK, i, j, k); // TODO: use blockPosition
     }
 
-    private Method h;
+    private Method h; // TODO: IS THIS VALID?
     private void invokeNmsH(Chunk nmsChunk, int i, int j, int k) {
         try {
             if (h == null) {
@@ -199,7 +200,7 @@ public class NMSHandler implements NMSAbstraction {
         }
     }
 
-    private Method e;
+    private Method e; // TODO: IS THIS VALID?
     private void invokeNmsE(Chunk nmsChunk, int i, int j) {
         try {
             if (e == null) {

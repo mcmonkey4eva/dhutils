@@ -29,14 +29,6 @@ public class NMSHelper {
 		String serverPackageName = plugin.getServer().getClass().getPackage().getName();
 		String pluginPackageName = plugin.getClass().getPackage().getName();
 
-        // Check for MCPC+
-        try {
-            Class.forName("za.co.mcportcentral.MCPCUtils");
-            return initFallback();
-        } catch (ClassNotFoundException e) {
-            // not MCPC+ - just continue
-        }
-
         // Get full package string of CraftServer.
 		// org.bukkit.craftbukkit.vX_Y_Z (or for pre-refactor, just org.bukkit.craftbukkit)
 		String version = serverPackageName.substring(serverPackageName.lastIndexOf('.') + 1);
@@ -50,11 +42,7 @@ public class NMSHelper {
 		try {
 			clazz = Class.forName(pluginPackageName + ".dhutils.nms." + version + ".NMSHandler");
 		} catch (ClassNotFoundException e) {
-			if (fallbackOk) {
-				clazz = Class.forName(pluginPackageName + ".dhutils.nms.fallback.NMSHandler");
-			} else {
 				throw e;
-			}
 		}
 
 		// Check if we have a NMSAbstraction implementing class at that location.
@@ -68,9 +56,7 @@ public class NMSHelper {
 	}
 
     public static NMSAbstraction initFallback() {
-        nms = new me.desht.dhutils.nms.fallback.NMSHandler();
-
-        return nms;
+        return null;
     }
 
 	public static NMSAbstraction getNMS() {

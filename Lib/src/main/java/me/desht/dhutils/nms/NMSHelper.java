@@ -13,7 +13,7 @@ public class NMSHelper {
 	// is minimised.
 	@SuppressWarnings({"unused", "MismatchedReadAndWriteOfArray"})
 	private static final Class<?>[] classes = new Class<?>[] {
-            me.desht.dhutils.nms.v1_7_R4.NMSHandler.class,
+            me.desht.dhutils.nms.v1_8_R1.NMSHandler.class,
 	};
 
 	public static NMSAbstraction init(Plugin plugin) throws ClassNotFoundException, IllegalArgumentException,

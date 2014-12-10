@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>dhutils-v1_7_R4</artifactId>
+  <artifactId>dhutils-v1_8_R1</artifactId>
   <packaging>jar</packaging>
-  <name>DH Utils NMS v1.7-R4</name>
-  <version>v1_7_R4</version>
+  <name>DH Utils NMS v1.8-R1</name>
+  <version>v1_8_R1</version>
 
   <parent>
     <groupId>me.desht</groupId>
@@ -16,7 +16,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.7.10-R0.1-SNAPSHOT</version>
+      <version>1.8-R0.1-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
     <dependency>

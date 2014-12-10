@@ -1,12 +1,12 @@
-package me.desht.dhutils.nms.v1_7_R4;
+package me.desht.dhutils.nms.v1_8_R1;
 
 import me.desht.dhutils.nms.api.NMSAbstraction;
-import net.minecraft.server.v1_7_R4.*;
+import net.minecraft.server.v1_8_R1.*;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_7_R4.CraftChunk;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -16,7 +16,7 @@ public class NMSHandler implements NMSAbstraction {
 
 	@Override
     public boolean setBlockFast(World world, int x, int y, int z, int blockId, byte data) {
-        net.minecraft.server.v1_7_R4.World w = ((CraftWorld) world).getHandle();
+        net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
         Chunk chunk = w.getChunkAt(x >> 4, z >> 4);
         return a(chunk, x & 0x0f, y, z & 0x0f, Block.getById(blockId), data);
     }
@@ -119,7 +119,7 @@ public class NMSHandler implements NMSAbstraction {
 
 	@Override
 	public void forceBlockLightLevel(World world, int x, int y, int z, int level) {
-		net.minecraft.server.v1_7_R4.World w = ((CraftWorld) world).getHandle();
+		net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
 		w.b(EnumSkyBlock.BLOCK, x, y, z, level);
 	}
 
@@ -141,8 +141,8 @@ public class NMSHandler implements NMSAbstraction {
 
 	@Override
 	public Vector[] getBlockHitbox(org.bukkit.block.Block block) {
-		net.minecraft.server.v1_7_R4.World w = ((CraftWorld)block.getWorld()).getHandle();
-		net.minecraft.server.v1_7_R4.Block b = w.getType(block.getX(), block.getY(), block.getZ());
+		net.minecraft.server.v1_8_R1.World w = ((CraftWorld)block.getWorld()).getHandle();
+		net.minecraft.server.v1_8_R1.Block b = w.getType(block.getX(), block.getY(), block.getZ());
 		b.updateShape(w, block.getX(), block.getY(), block.getZ());
 		return new Vector[] {
 				new Vector(block.getX() + b.x(), block.getY() + b.z(), block.getZ() + b.B()),
@@ -181,7 +181,7 @@ public class NMSHandler implements NMSAbstraction {
             invokeNmsE(nmsChunk, i, k);
         }
 
-        net.minecraft.server.v1_7_R4.World w = ((CraftWorld) world).getHandle();
+        net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
         w.c(EnumSkyBlock.BLOCK, i, j, k);
     }
 

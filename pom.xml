@@ -41,7 +41,7 @@
 
     <modules>
         <module>API</module>
-        <module>v1_7_R4</module>
+        <module>v1_8_R4</module>
         <module>Lib</module>
     </modules>
 

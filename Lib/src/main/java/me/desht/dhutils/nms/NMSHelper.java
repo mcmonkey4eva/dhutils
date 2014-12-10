@@ -13,20 +13,6 @@ public class NMSHelper {
 	// is minimised.
 	@SuppressWarnings({"unused", "MismatchedReadAndWriteOfArray"})
 	private static final Class<?>[] classes = new Class<?>[] {
-			me.desht.dhutils.nms.fallback.NMSHandler.class,
-			me.desht.dhutils.nms.pre.NMSHandler.class,
-			me.desht.dhutils.nms.v1_4_5.NMSHandler.class,
-			me.desht.dhutils.nms.v1_4_6.NMSHandler.class,
-			me.desht.dhutils.nms.v1_4_R1.NMSHandler.class,
-			me.desht.dhutils.nms.v1_5_R1.NMSHandler.class,
-			me.desht.dhutils.nms.v1_5_R2.NMSHandler.class,
-			me.desht.dhutils.nms.v1_5_R3.NMSHandler.class,
-			me.desht.dhutils.nms.v1_6_R1.NMSHandler.class,
-			me.desht.dhutils.nms.v1_6_R2.NMSHandler.class,
-			me.desht.dhutils.nms.v1_6_R3.NMSHandler.class,
-			me.desht.dhutils.nms.v1_7_R1.NMSHandler.class,
-			me.desht.dhutils.nms.v1_7_R2.NMSHandler.class,
-			me.desht.dhutils.nms.v1_7_R3.NMSHandler.class,
             me.desht.dhutils.nms.v1_7_R4.NMSHandler.class,
 	};
 

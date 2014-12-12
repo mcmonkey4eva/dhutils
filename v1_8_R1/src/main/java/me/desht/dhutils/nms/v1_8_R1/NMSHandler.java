@@ -10,108 +10,161 @@ import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class NMSHandler implements NMSAbstraction {
+
+    private static Field CHUNK_F_INT_ARRAY = null;
+    private static Method CHUNK_D_THREE_INT_METHOD = null;
+    private static Method CHUNK_D_TWO_INT_METHOD = null;
+    static {
+        try {
+            Class<Chunk> chunk = Chunk.class;
+            CHUNK_F_INT_ARRAY = chunk.getDeclaredField("f");
+            CHUNK_F_INT_ARRAY.setAccessible(true);
+            CHUNK_D_THREE_INT_METHOD = chunk.getDeclaredMethod("d", int.class, int.class, int.class);
+            CHUNK_D_THREE_INT_METHOD.setAccessible(true);
+            CHUNK_D_TWO_INT_METHOD = chunk.getDeclaredMethod("d", int.class, int.class);
+            CHUNK_D_TWO_INT_METHOD.setAccessible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int getChunkFIntArray(Chunk that, int index) {
+        try {
+            return ((int[]) CHUNK_F_INT_ARRAY.get(that))[index];
+        } catch (Exception e) {
+            System.out.println("Reflection exception: " + e);
+            return 0;
+        }
+    }
+
+    private static void setChunkFIntArray(Chunk that, int index, int set) {
+        try {
+            ((int[]) CHUNK_F_INT_ARRAY.get(that))[index] = set;
+        } catch (Exception e) {
+            System.out.println("Reflection exception: " + e);
+        }
+    }
+
+    private void invokeChunkDThreeIntMethod(Chunk nmsChunk, int i, int j, int k) {
+        try {
+            CHUNK_D_THREE_INT_METHOD.invoke(nmsChunk, i, j, k);
+        } catch (Exception e) {
+            System.out.println("Reflection exception: " + e);
+        }
+    }
+
+    private void invokeChunkDTwoIntMethod(Chunk nmsChunk, int i, int j) {
+        try {
+            CHUNK_D_TWO_INT_METHOD.invoke(nmsChunk, i, j);
+        } catch (Exception e) {
+            System.out.println("Reflection exception: " + e);
+        }
+    }
 
 	@Override
     public boolean setBlockFast(World world, int x, int y, int z, int blockId, byte data) {
         net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
         Chunk chunk = w.getChunkAt(x >> 4, z >> 4);
-        return a(chunk, x & 0x0f, y, z & 0x0f, Block.getById(blockId), data);
+        return a(chunk, new BlockPosition(x, y, z), Block.getById(blockId).fromLegacyData(data));
     }
 
-    private boolean a(Chunk that, int i, int j, int k, Block block, int l) {
+    private boolean a(Chunk that, BlockPosition blockposition, IBlockData iblockdata) {
+        int i = blockposition.getX() & 15;
+        int j = blockposition.getY();
+        int k = blockposition.getZ() & 15;
+
         int i1 = k << 4 | i;
 
-        if (j >= that.b[i1] - 1) { // TODO: Reflection: Access f[]
-            that.b[i1] = -999; // TODO: Reflection: Access f[]
+        if (j >= getChunkFIntArray(that, i1) - 1) {
+            setChunkFIntArray(that, i1, -999);
         }
 
         int j1 = that.heightMap[i1];
-        Block block1 = that.getType(i, j, k); // TODO: Reflection: access getType()
-        int k1 = that.getData(i, j, k); // TODO: Reflection: access g()
+        IBlockData iblockdata1 = that.getBlockData(blockposition);
+        int k1 = that.c(blockposition);
 
-        if (block1 == block && k1 == l) {
+        if (iblockdata1 == iblockdata) {
             return false;
         } else {
-            boolean flag = false;
+            Block block = iblockdata.getBlock();
+            Block block1 = iblockdata1.getBlock();
             ChunkSection chunksection = that.getSections()[j >> 4];
+            boolean flag = false;
 
             if (chunksection == null) {
                 if (block == Blocks.AIR) {
                     return false;
                 }
 
-                chunksection = that.getSections()[j >> 4] = new ChunkSection(j >> 4 << 4, !that.world.worldProvider.g);
+                chunksection = that.getSections()[j >> 4] = new ChunkSection(j >> 4 << 4, !that.world.worldProvider.o());
                 flag = j >= j1;
-            }
-
-            int l1 = that.locX * 16 + i;
-            int i2 = that.locZ * 16 + k;
-
-            if (!that.world.isStatic) {
-                block1.f(that.world, l1, j, i2, k1); // TODO: switch to k() and use BlockPosition
             }
 
             // CraftBukkit start - Delay removing containers until after they're cleaned up
             if (!(block1 instanceof IContainer)) {
-                chunksection.setTypeId(i, j & 15, k, block);
+                chunksection.setType(i, j & 15, k, iblockdata);
             }
             // CraftBukkit end
 
-            if (!that.world.isStatic) {
-                block1.remove(that.world, l1, j, i2, block1, k1); // TODO: Use blockPosition, blockData
-            } else if (block1 instanceof IContainer && block1 != block) {
-                that.world.p(l1, j, i2);
+            if (block1 != block) {
+                if (!that.world.isStatic) {
+                    block1.remove(that.world, blockposition, iblockdata1);
+                } else if (block1 instanceof IContainer) {
+                    that.world.t(blockposition);
+                }
             }
 
             // CraftBukkit start - Remove containers now after cleanup
             if (block1 instanceof IContainer) {
-                chunksection.setTypeId(i, j & 15, k, block);
+                chunksection.setType(i, j & 15, k, iblockdata);
             }
             // CraftBukkit end
 
-            if (chunksection.getTypeId(i, j & 15, k) != block) {
+            if (chunksection.b(i, j & 15, k) != block) {
                 return false;
             } else {
-                chunksection.setData(i, j & 15, k, l);
+                chunksection.setType(i, j & 15, k, iblockdata);
                 if (flag) {
                     that.initLighting();
                 }
                 TileEntity tileentity;
 
                 if (block1 instanceof IContainer) {
-                    tileentity = that.e(i, j, k);
-                    if (tileentity != null) {
-                        tileentity.u();
+                    tileentity = that.a(blockposition, EnumTileEntityState.CHECK);
+                    if(tileentity != null) {
+                        tileentity.E();
                     }
                 }
 
                 // CraftBukkit - Don't place while processing the BlockPlaceEvent, unless it's a BlockContainer
-                if (!that.world.isStatic && (!that.world.captureBlockStates || (block instanceof BlockContainer))) {
-                    block.onPlace(that.world, l1, j, i2); // TODO: use blockPosition
+                if (!that.world.isStatic && block1 != block
+                        && (!that.world.captureBlockStates || (block instanceof BlockContainer))) {
+                    block.onPlace(that.world, blockposition, iblockdata);
                 }
 
                 if (block instanceof IContainer) {
                     // CraftBukkit start - Don't create tile entity if placement failed
-                    if (that.getType(i, j, k) != block) { // TODO: Reflection: access getType()
+                    if (that.getType(blockposition) != block) {
                         return false;
                     }
                     // CraftBukkit end
 
-                    tileentity = that.e(i, j, k);
+                    tileentity = that.a(blockposition, EnumTileEntityState.CHECK);
                     if (tileentity == null) {
-                        tileentity = ((IContainer) block).a(that.world, l);
-                        that.world.setTileEntity(l1, j, i2, tileentity); // TODO: use BlockPosition
+                        tileentity = ((IContainer) block).a(that.world, block.toLegacyData(iblockdata));
+                        that.world.setTileEntity(blockposition, tileentity);
                     }
 
                     if (tileentity != null) {
-                        tileentity.u();
+                        tileentity.E();
                     }
                 }
 
-                that.n = true;
+                that.e();
                 return true;
             }
         }
@@ -120,17 +173,17 @@ public class NMSHandler implements NMSAbstraction {
 	@Override
 	public void forceBlockLightLevel(World world, int x, int y, int z, int level) {
 		net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
-		w.b(EnumSkyBlock.BLOCK, x, y, z, level);
+		w.a(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z), level);
 	}
 
 	@Override
 	public int getBlockLightEmission(int blockId) {
-		return Block.getById(blockId).n(); // note: updated
+		return Block.getById(blockId).p();
 	}
 
 	@Override
 	public int getBlockLightBlocking(int blockId) {
-		return Block.getById(blockId).k(); // TODO: reflection: read int 's'
+		return Block.getById(blockId).n();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -141,9 +194,10 @@ public class NMSHandler implements NMSAbstraction {
 
 	@Override
 	public Vector[] getBlockHitbox(org.bukkit.block.Block block) {
+        BlockPosition blockposition = new BlockPosition(block.getX(), block.getY(), block.getZ());
 		net.minecraft.server.v1_8_R1.World w = ((CraftWorld)block.getWorld()).getHandle();
-		net.minecraft.server.v1_8_R1.Block b = w.getType(block.getX(), block.getY(), block.getZ()); // TODO: use block position
-		b.updateShape(w, block.getX(), block.getY(), block.getZ()); // TODO: use block position
+		net.minecraft.server.v1_8_R1.Block b = w.getType(blockposition).getBlock();
+		b.updateShape(w, blockposition);
 		return new Vector[] {
 				new Vector(block.getX() + b.z(), block.getY() + b.B(), block.getZ() + b.D()), // note: updated
 				new Vector(block.getX() + b.A(), block.getY() + b.C(), block.getZ() + b.E()) // note: updated
@@ -157,61 +211,36 @@ public class NMSHandler implements NMSAbstraction {
             return;
         }
 
-        int i = x & 0x0F;
-        int j = y & 0xFF;
-        int k = z & 0x0F;
+        int i = x & 15;
+        int j = y & 255;
+        int k = z & 15;
+
+        BlockPosition blockposition = new BlockPosition(i, j, k);
+
         CraftChunk craftChunk = (CraftChunk)world.getChunkAt(x >> 4, z >> 4);
         Chunk nmsChunk = craftChunk.getHandle();
 
         int i1 = k << 4 | i;
         int maxY = nmsChunk.heightMap[i1];
 
-        Block block = nmsChunk.getType(i, j, k); // TODO: reflection: access getType
-        int j2 = block.k();
+        Block block = nmsChunk.getType(blockposition);
+        int j2 = block.n(); // TODO: should this be getBlockLightBlocking(Block.getId(block))?
 
         if (j2 > 0) {
             if (j >= maxY) {
-                invokeNmsH(nmsChunk, i, j + 1, k);
+                invokeChunkDThreeIntMethod(nmsChunk, i, j + 1, k);
             }
         } else if (j == maxY - 1) {
-            invokeNmsH(nmsChunk,i, j, k);
+            invokeChunkDThreeIntMethod(nmsChunk, i, j, k);
         }
 
-        if (nmsChunk.getBrightness(EnumSkyBlock.SKY, i, j, k) > 0 // TODO: use blockPosition
-                || nmsChunk.getBrightness(EnumSkyBlock.BLOCK, i, j, k) > 0) { // TODO: use blockPosition
-            invokeNmsE(nmsChunk, i, k);
+        if (nmsChunk.getBrightness(EnumSkyBlock.SKY, blockposition) > 0
+                || nmsChunk.getBrightness(EnumSkyBlock.BLOCK, blockposition) > 0) {
+            invokeChunkDTwoIntMethod(nmsChunk, i, k);
         }
 
         net.minecraft.server.v1_8_R1.World w = ((CraftWorld) world).getHandle();
-        w.c(EnumSkyBlock.BLOCK, i, j, k); // TODO: use blockPosition
-    }
-
-    private Method h; // TODO: IS THIS VALID?
-    private void invokeNmsH(Chunk nmsChunk, int i, int j, int k) {
-        try {
-            if (h == null) {
-                Class[] classes = {int.class, int.class, int.class};
-                h = Chunk.class.getDeclaredMethod("h", classes);
-                h.setAccessible(true);
-            }
-            h.invoke(nmsChunk, i, j, k);
-        } catch (Exception e) {
-            System.out.println("Reflection exception: " + e);
-        }
-    }
-
-    private Method e; // TODO: IS THIS VALID?
-    private void invokeNmsE(Chunk nmsChunk, int i, int j) {
-        try {
-            if (e == null) {
-                Class[] classes = {int.class, int.class};
-                e = Chunk.class.getDeclaredMethod("e", classes);
-                e.setAccessible(true);
-            }
-            e.invoke(nmsChunk, i, j);
-        } catch (Exception e) {
-            System.out.println("Reflection exception: " + e);
-        }
+        w.c(EnumSkyBlock.BLOCK, blockposition);
     }
 
     private boolean canAffectLighting(World world, int x, int y, int z) {

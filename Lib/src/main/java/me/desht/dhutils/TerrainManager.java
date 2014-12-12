@@ -3,6 +3,7 @@ package me.desht.dhutils;
 import java.io.File;
 import java.io.IOException;
 
+import com.sk89q.worldedit.util.io.file.FilenameException;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -10,7 +11,6 @@ import org.bukkit.entity.Player;
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
-import com.sk89q.worldedit.FilenameException;
 import com.sk89q.worldedit.LocalPlayer;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -37,7 +37,7 @@ public class TerrainManager {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param wep	the WorldEdit plugin instance
 	 * @param player	the player to work with
 	 */
@@ -45,12 +45,12 @@ public class TerrainManager {
 		we = wep.getWorldEdit();
 		localPlayer = wep.wrapPlayer(player);
 		localSession = we.getSession(localPlayer);
-		editSession = localSession.createEditSession(localPlayer);		
+		editSession = localSession.createEditSession(localPlayer);
 	}
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param wep	the WorldEdit plugin instance
 	 * @param world	the world to work in
 	 */
@@ -64,7 +64,7 @@ public class TerrainManager {
 	/**
 	 * Write the terrain bounded by the given locations to the given file as a MCedit format
 	 * schematic.
-	 * 
+	 *
 	 * @param saveFile	a File representing the schematic file to create
 	 * @param l1	one corner of the region to save
 	 * @param l2	the corner of the region to save, opposite to l1
@@ -89,7 +89,7 @@ public class TerrainManager {
 	/**
 	 * Load the data from the given schematic file and paste it at the given location.  If the location is null, then
 	 * paste it at the saved data's origin.
-	 * 
+	 *
 	 * @param saveFile	a File representing the schematic file to load
 	 * @param loc		the location to paste the clipboard at (may be null)
 	 * @throws FilenameException
@@ -104,15 +104,16 @@ public class TerrainManager {
 		                              EXTENSION, new String[] { EXTENSION });
 
 		editSession.enableQueue();
-		localSession.setClipboard(SchematicFormat.MCEDIT.load(saveFile));
-		localSession.getClipboard().place(editSession, getPastePosition(loc), false);
+		// TODO: setClipboard(), getClipboard() ?
+		CuboidClipboard clip = SchematicFormat.MCEDIT.load(saveFile);
+		clip.place(editSession, clip.getOrigin(), false);
 		editSession.flushQueue();
 		we.flushBlockBag(localPlayer, editSession);
 	}
 
 	/**
 	 * Load the data from the given schematic file and paste it at the saved clipboard's origin.
-	 * 
+	 *
 	 * @param saveFile
 	 * @throws FilenameException
 	 * @throws DataException
@@ -122,13 +123,6 @@ public class TerrainManager {
 	 */
 	public void loadSchematic(File saveFile) throws FilenameException, DataException, IOException, MaxChangedBlocksException, EmptyClipboardException {
 		loadSchematic(saveFile, null);
-	}
-
-	private Vector getPastePosition(Location loc) throws EmptyClipboardException {
-		if (loc == null) 
-			return localSession.getClipboard().getOrigin();
-		else 
-			return new Vector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 
 	private Vector getMin(Location l1, Location l2) {

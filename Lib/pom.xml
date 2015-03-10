@@ -29,6 +29,11 @@
             <name>Comphenix Repository</name>
             <url>http://repo.comphenix.net/content/groups/public</url>
         </repository>
+        <repository>
+            <id>RoyalDev</id>
+            <name>Comphenix Alternate</name>
+            <url>http://minor.royaldev.org:8081/nexus/content/groups/public</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -53,7 +58,7 @@
        <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>2.4.7</version>
+            <version>2.6.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

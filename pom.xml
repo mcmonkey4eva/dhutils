@@ -12,9 +12,9 @@
     <description>Collection of useful classes I use in my plugins</description>
 
     <scm>
-        <connection>scm:git:git://github.com/desht/dhutils.git</connection>
-        <developerConnection>scm:git:git@github.com:desht/desht.git</developerConnection>
-        <url>https://github.com/desht/dhutils</url>
+        <connection>scm:git:git://github.com/mcmonkey4eva/dhutils.git</connection>
+        <developerConnection>scm:git:git@github.com:mcmonkey4eva/desht.git</developerConnection>
+        <url>https://github.com/mcmonkey4eva/dhutils</url>
     </scm>
 
     <licenses>
@@ -42,6 +42,7 @@
     <modules>
         <module>API</module>
         <module>v1_8_R1</module>
+        <module>v1_8_R2</module>
         <module>Lib</module>
     </modules>
 

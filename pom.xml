@@ -27,7 +27,6 @@
 
     <modules>
         <module>API</module>
-        <module>v1_8_R1</module>
         <module>v1_8_R2</module>
         <module>Lib</module>
     </modules>

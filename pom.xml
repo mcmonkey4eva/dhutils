@@ -25,20 +25,6 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <id>desht</id>
-            <name>Des Herriott</name>
-            <email>des.herriott@gmail.com</email>
-            <url>http://github.com/desht</url>
-            <roles>
-                <role>developer</role>
-                <role>maintainer</role>
-            </roles>
-            <timezone>1</timezone>
-        </developer>
-    </developers>
-
     <modules>
         <module>API</module>
         <module>v1_8_R1</module>

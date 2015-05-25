@@ -28,6 +28,7 @@
     <modules>
         <module>API</module>
         <module>v1_8_R2</module>
+        <module>v1_8_R3</module>
         <module>Lib</module>
     </modules>
 

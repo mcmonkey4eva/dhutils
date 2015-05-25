@@ -74,6 +74,12 @@
             <version>v1_8_R2</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>me.desht</groupId>
+            <artifactId>dhutils-v1_8_R3</artifactId>
+            <version>v1_8_R3</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
